@@ -41,6 +41,13 @@ int main(int argc, char** argv)
 	string size = "";
 	int strToInt_Sz = 0;
 
+	/*Takes the arguments from the command line and determines which type of call is required.
+	Defaults to command with two arguments (the name of the executable program and the argument
+	for the algorithm). The last argument is, however, useless as the purpose of each module is 
+	to focus on one algorithm specifically. Therefore, even though "S" is selected, it will always 
+	run insertion, to avoid confusion. This is the purpose of the two separate module, as specified 
+	in the assignment.
+	*/
 	if (argc == 4) {
 
 		size = argv[1];
@@ -110,6 +117,7 @@ void descending(int n) {
 void random(int n) {
 	int size = 0;
 
+	/* This will create an array with all random numbers.*/
 	if (n > 1) {
 		int *array = new int[n];
 		srand((unsigned)time(0));
@@ -129,6 +137,7 @@ void random(int n) {
 
 void chooseFunction(int n, string s) {
 
+	// Conditional statements to run the program depending on the provided argument for sorting order.
 	if (s.compare("A") == 0) {
 		ascending(n);
 	}
@@ -146,6 +155,11 @@ void insertionSort(int * p, int s) {
 	cout << endl << "Insertion Sort" << endl;
 	cout << "---------------------- - " << endl;
 
+	/* key is initially set to the array's third element.
+	i is set to 1. While i is greater than zero and the array's
+	current element is greather than the key, sort is necessary.
+	swapping p's upcoming element with the previous both.
+	*/
 	for (int j = 2; j <= s; j++) {
 		int key = p[j];
 		int i = j - 1;
