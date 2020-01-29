@@ -24,7 +24,7 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-const int DEF_SIZE = 10;
+const int DEF_SIZE = 1000;
 const string DEF_ORDER = "R";
 
 void error();
@@ -160,11 +160,10 @@ void insertionSort(int * p, int s) {
 	current element is greather than the key, sort is necessary.
 	swapping p's upcoming element with the previous both.
 	*/
-	for (int j = 2; j <= s; j++) {
+	for (int j = 1; j < s; j++) {
 		int key = p[j];
 		int i = j - 1;
-		while (i > 0 && p[i] > key)
-		{
+		while (i >= 0 && p[i] > key) {
 			p[i + 1] = p[i];
 			i--;
 		}
