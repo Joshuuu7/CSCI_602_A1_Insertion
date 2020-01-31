@@ -24,21 +24,22 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-const int DEF_SIZE = 1000;
-const string DEF_ORDER = "R";
+const int DEF_SIZE = 10;
+const string DEF_ORDER = "R", DEF_ALG = "I", DELIMITER = "=";
 
-void error();
+string getToken(string str);
+void checkInsertArg(int strToInt_Sz, string sortToken, string insAlg);
+void error(string message);
 void ascending(int n);
 void descending(int n);
 void random(int n);
-void chooseFunction(int n = DEF_SIZE, string s = DEF_ORDER);
+void chooseSortOrder(int n = DEF_SIZE, string s = DEF_ORDER);
 void insertionSort(int * p, int s);
 void printArray(int * p, int s);
 
 int main(int argc, char** argv)
 {
-	string order;
-	string size = "";
+	string number = "", sort = "", numberToken = "", sortToken = "", insAlg = "", insAlgToken = "";
 	int strToInt_Sz = 0;
 
 	/*Takes the arguments from the command line and determines which type of call is required.
@@ -49,31 +50,52 @@ int main(int argc, char** argv)
 	in the assignment.
 	*/
 	if (argc == 4) {
-
-		size = argv[1];
-		strToInt_Sz = stoi(size);
-		order = *argv[2];
-		chooseFunction(strToInt_Sz, order);
+		number = argv[1];
+		sort = argv[2];
+		insAlg = argv[3];
+		string numberToken = getToken(number), sortToken = getToken(sort), algToken = getToken(insAlg);
+		int strToInt_Sz = stoi(numberToken);
+		checkInsertArg(strToInt_Sz, sortToken, insAlg);
 	}
 	else if (argc == 3) {
-
-		if ((int)*argv[1]) {
-			size = argv[1];
-			strToInt_Sz = stoi(size);
-			chooseFunction(strToInt_Sz, DEF_ORDER);
+		string firstArg = argv[1];
+		string firstArgToken = getToken(firstArg);
+		if ((stoi(firstArgToken)) == true) {
+			strToInt_Sz = stoi(numberToken);
+			insAlg = argv[2];
+			checkInsertArg(strToInt_Sz, DEF_ORDER, insAlg);
 		}
 		else {
-			order = argv[1];
-			chooseFunction(DEF_SIZE, order);
+			sort = argv[1];
+			sortToken = getToken(sort);
+			insAlg = argv[2];
+			checkInsertArg(DEF_SIZE, sortToken, insAlg);
 		}
 	}
 	else {
-		chooseFunction(DEF_SIZE, DEF_ORDER);
+		insAlg = argv[1];
+		insAlgToken = getToken(insAlg);
+		checkInsertArg(DEF_SIZE, DEF_ORDER, insAlgToken);
 	}
 }
 
-void error() {
-	cout << "ERROR: Please enter a positive number!" << endl;
+string getToken(string str) {
+	string token = str.substr(str.find(DELIMITER) + 1);
+	return token;
+}
+
+void checkInsertArg(int strToInt_Sz, string sortToken, string insAlg) {
+	string insAlgToken = getToken(insAlg);
+	if (insAlgToken.compare("I") == 0) {
+		chooseSortOrder(strToInt_Sz, sortToken);
+	}
+	else {
+		error("This is module supports insertion sorting only! Provide argument G=I.");
+	}
+}
+
+void error(string message = "Enter a positive number!") {
+	cout << "ERROR: " + message << endl;
 }
 
 void ascending(int n) {
@@ -83,10 +105,9 @@ void ascending(int n) {
 		int *array = new int[n];
 		for (int j = 0; j <= n - 1; j++) {
 			array[j] = j;
-			cout << "a[" << j << "] = " << array[j] << endl;
 			size = j + 1;
-
 		}
+		printArray(array, n);
 		cout << "Array Size: " << size << endl;
 		insertionSort(array, size);
 	}
@@ -103,9 +124,9 @@ void descending(int n) {
 		for (int j = 0; n - 1 >= 0; j++) {
 			n--;
 			array[j] = n;
-			cout << "a[" << j << "] = " << array[j] << endl;
 			size = j + 1;
 		}
+		printArray(array, n);
 		cout << "Array Size: " << size << endl;
 		insertionSort(array, size);
 	}
@@ -124,9 +145,9 @@ void random(int n) {
 		for (int j = 0; n - 1 >= 0; j++) {
 			n--;
 			array[j] = (rand() % 1000) + 1;
-			cout << "a[" << j << "] = " << array[j] << endl;
 			size = j + 1;
 		}
+		printArray(array, size);
 		cout << "Array Size: " << size << endl;
 		insertionSort(array, size);
 	}
@@ -135,7 +156,7 @@ void random(int n) {
 	}
 }
 
-void chooseFunction(int n, string s) {
+void chooseSortOrder(int n, string s) {
 
 	// Conditional statements to run the program depending on the provided argument for sorting order.
 	if (s.compare("A") == 0) {
@@ -144,16 +165,21 @@ void chooseFunction(int n, string s) {
 	else if (s.compare("D") == 0) {
 		descending(n);
 	}
+	else if (s.compare("R") == 0){
+		random(n);
+	}
+	else if (s.compare("A") != 0 || s.compare("D") != 0 || s.compare("R") != 0){
+		error("Provide only valid optional parameters (S=A, S=D, or S=R) /n or leave the optional field blank for the defualt random sorting.");
+	}
 	else {
 		random(n);
 	}
-
 }
 
 void insertionSort(int * p, int s) {
 
 	cout << endl << "Insertion Sort" << endl;
-	cout << "---------------------- - " << endl;
+	cout << "-----------------------" << endl;
 
 	/* key is initially set to the array's third element.
 	i is set to 1. While i is greater than zero and the array's
@@ -174,7 +200,7 @@ void insertionSort(int * p, int s) {
 
 void printArray(int * p, int s) {
 	for (int o = 0; o < s; o++) {
-		cout << "a[" << o << "] = " << p[o] << endl;
+		cout << "A[" << o << "] = " << p[o] << endl;
 	}
 }
 
