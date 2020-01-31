@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <string>
 #include <ctime>
+#include <cstring>
 
 using namespace std;
 
@@ -24,10 +25,14 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-const int DEF_SIZE = 10;
-const string DEF_ORDER = "R", DEF_ALG = "I", DELIMITER = "=";
+const int DEF_SIZE = 1000;
+const string LEADING_NUM_TOKEN = "N", LEADING_SORT_TOKEN = "S", LEADING_ALG_TOKEN = "G",
+DEF_ORDER = "R", DEF_ALG = "I", DELIMITER = "=";
 
+bool checkLeadingTokens(string t);
+string getLeadingToken(string str);
 string getToken(string str);
+bool is_number(const string& s);
 void checkInsertArg(int strToInt_Sz, string sortToken, string insAlg);
 void error(string message);
 void ascending(int n);
@@ -39,49 +44,97 @@ void printArray(int * p, int s);
 
 int main(int argc, char** argv)
 {
-	string number = "", sort = "", numberToken = "", sortToken = "", insAlg = "", insAlgToken = "";
+	string leading_num = "", leading_sort = "", leading_alg = "",
+		number = "", sort = "", insAlg = "",
+		numberToken = "", sortToken = "", insAlgToken = "";
 	int strToInt_Sz = 0;
+	bool leading_N = false, leading_S = false, leading_G = false;
 
 	/*Takes the arguments from the command line and determines which type of call is required.
 	Defaults to command with two arguments (the name of the executable program and the argument
-	for the algorithm). The last argument is, however, useless as the purpose of each module is 
-	to focus on one algorithm specifically. Therefore, even though "S" is selected, it will always 
-	run insertion, to avoid confusion. This is the purpose of the two separate module, as specified 
+	for the algorithm). The last argument is, however, useless as the purpose of each module is
+	to focus on one algorithm specifically. Therefore, even though "S" is selected, it will always
+	run insertion, to avoid confusion. This is the purpose of the two separate module, as specified
 	in the assignment.
 	*/
+
 	if (argc == 4) {
-		number = argv[1];
-		sort = argv[2];
-		insAlg = argv[3];
-		string numberToken = getToken(number), sortToken = getToken(sort), algToken = getToken(insAlg);
-		int strToInt_Sz = stoi(numberToken);
-		checkInsertArg(strToInt_Sz, sortToken, insAlg);
+		leading_num = getLeadingToken(argv[1]);
+		leading_sort = getLeadingToken(argv[2]);
+		leading_alg = getLeadingToken(argv[3]);
+
+		leading_N = checkLeadingTokens(leading_num);
+		leading_S = checkLeadingTokens(leading_sort);
+		leading_G = checkLeadingTokens(leading_alg);
+
+		if (leading_N == true && leading_S == true && leading_G == true) {
+			number = argv[1];
+			sort = argv[2];
+			insAlg = argv[3];
+			numberToken = getToken(number), sortToken = getToken(sort), insAlgToken = getToken(insAlg);
+			strToInt_Sz = stoi(numberToken);
+			checkInsertArg(strToInt_Sz, sortToken, insAlg);
+		}
 	}
 	else if (argc == 3) {
 		string firstArg = argv[1];
 		string firstArgToken = getToken(firstArg);
-		if ((stoi(firstArgToken)) == true) {
-			strToInt_Sz = stoi(numberToken);
-			insAlg = argv[2];
-			checkInsertArg(strToInt_Sz, DEF_ORDER, insAlg);
+		bool is_num = is_number(firstArgToken);
+		if (is_num) {
+			leading_num = getLeadingToken(argv[1]), leading_alg = getLeadingToken(argv[2]);
+			leading_N = checkLeadingTokens(leading_num), leading_G = checkLeadingTokens(leading_alg);
+			if (leading_N == true && leading_G == true) {
+				strToInt_Sz = stoi(firstArgToken);
+				insAlg = argv[2];
+				checkInsertArg(strToInt_Sz, DEF_ORDER, insAlg);
+			}
 		}
 		else {
-			sort = argv[1];
-			sortToken = getToken(sort);
-			insAlg = argv[2];
-			checkInsertArg(DEF_SIZE, sortToken, insAlg);
+			leading_sort = getLeadingToken(argv[1]), leading_alg = getLeadingToken(argv[2]);
+			leading_S = checkLeadingTokens(leading_sort), leading_G = checkLeadingTokens(leading_alg);
+			if (leading_S == true && leading_G == true) {
+				sort = argv[1];
+				sortToken = getToken(sort);
+				insAlg = argv[2];
+				checkInsertArg(DEF_SIZE, sortToken, insAlg);
+			}
+		}
+	}
+	else if (argc == 2) {
+		leading_sort = getLeadingToken(argv[1]);
+		leading_G = checkLeadingTokens(leading_alg);
+		if (leading_G == true) {
+			insAlg = argv[1];
+			checkInsertArg(DEF_SIZE, DEF_ORDER, insAlg);
 		}
 	}
 	else {
-		insAlg = argv[1];
-		insAlgToken = getToken(insAlg);
-		checkInsertArg(DEF_SIZE, DEF_ORDER, insAlgToken);
+		error("The argument G=I is mandatory.");
 	}
+}
+
+bool checkLeadingTokens(string t) {
+	if (t.compare(LEADING_NUM_TOKEN) == 0 || t.compare(LEADING_SORT_TOKEN) == 0 || t.compare(LEADING_ALG_TOKEN) == 0) {
+		return true;
+	}
+	else {
+		error("Enter the valid leading parameters (N S G).");
+		return false;
+	}
+}
+
+string getLeadingToken(string str) {
+	string leadingToken = str.substr(0, str.find(DELIMITER));
+	return leadingToken;
 }
 
 string getToken(string str) {
 	string token = str.substr(str.find(DELIMITER) + 1);
 	return token;
+}
+
+bool is_number(const string& s) {
+	return(strspn(s.c_str(), "0123456789") == s.size());
 }
 
 void checkInsertArg(int strToInt_Sz, string sortToken, string insAlg) {
@@ -100,7 +153,6 @@ void error(string message = "Enter a positive number!") {
 
 void ascending(int n) {
 	int size = 0;
-
 	if (n > 1) {
 		int *array = new int[n];
 		for (int j = 0; j <= n - 1; j++) {
@@ -118,7 +170,6 @@ void ascending(int n) {
 
 void descending(int n) {
 	int size = 0;
-
 	if (n > 1) {
 		int *array = new int[n];
 		for (int j = 0; n - 1 >= 0; j++) {
@@ -126,7 +177,7 @@ void descending(int n) {
 			array[j] = n;
 			size = j + 1;
 		}
-		printArray(array, n);
+		printArray(array, size);
 		cout << "Array Size: " << size << endl;
 		insertionSort(array, size);
 	}
@@ -137,7 +188,6 @@ void descending(int n) {
 
 void random(int n) {
 	int size = 0;
-
 	/* This will create an array with all random numbers.*/
 	if (n > 1) {
 		int *array = new int[n];
@@ -165,10 +215,10 @@ void chooseSortOrder(int n, string s) {
 	else if (s.compare("D") == 0) {
 		descending(n);
 	}
-	else if (s.compare("R") == 0){
+	else if (s.compare("R") == 0) {
 		random(n);
 	}
-	else if (s.compare("A") != 0 || s.compare("D") != 0 || s.compare("R") != 0){
+	else if (s.compare("A") != 0 || s.compare("D") != 0 || s.compare("R") != 0) {
 		error("Provide only valid optional parameters (S=A, S=D, or S=R) /n or leave the optional field blank for the defualt random sorting.");
 	}
 	else {
