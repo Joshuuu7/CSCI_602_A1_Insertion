@@ -29,7 +29,7 @@ const int DEF_SIZE = 1000;
 const string LEADING_NUM_TOKEN = "N", LEADING_SORT_TOKEN = "S", LEADING_ALG_TOKEN = "G",
 DEF_ORDER = "R", DEF_ALG = "I", DELIMITER = "=";
 
-bool checkLeadingTokens(string t);
+bool checkLeadingTokens(string n, string s, string g);
 string getLeadingToken(string str);
 string getToken(string str);
 bool is_number(const string& s);
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 		number = "", sort = "", insAlg = "",
 		numberToken = "", sortToken = "", insAlgToken = "";
 	int strToInt_Sz = 0;
-	bool leading_N = false, leading_S = false, leading_G = false;
+	bool leading_Tokens = false;
 
 	/*Takes the arguments from the command line and determines which type of call is required.
 	Defaults to command with two arguments (the name of the executable program and the argument
@@ -63,17 +63,15 @@ int main(int argc, char** argv)
 		leading_sort = getLeadingToken(argv[2]);
 		leading_alg = getLeadingToken(argv[3]);
 
-		leading_N = checkLeadingTokens(leading_num);
-		leading_S = checkLeadingTokens(leading_sort);
-		leading_G = checkLeadingTokens(leading_alg);
+		leading_Tokens = checkLeadingTokens(leading_num, leading_sort, leading_alg);
 
-		if (leading_N == true && leading_S == true && leading_G == true) {
+		if (leading_Tokens == true) {
 			number = argv[1];
 			sort = argv[2];
 			insAlg = argv[3];
 			numberToken = getToken(number), sortToken = getToken(sort), insAlgToken = getToken(insAlg);
 			strToInt_Sz = stoi(numberToken);
-			checkInsertArg(strToInt_Sz, sortToken, insAlg);
+			checkInsertArg(strToInt_Sz, sortToken, insAlgToken);
 		}
 	}
 	else if (argc == 3) {
@@ -82,30 +80,32 @@ int main(int argc, char** argv)
 		bool is_num = is_number(firstArgToken);
 		if (is_num) {
 			leading_num = getLeadingToken(argv[1]), leading_alg = getLeadingToken(argv[2]);
-			leading_N = checkLeadingTokens(leading_num), leading_G = checkLeadingTokens(leading_alg);
-			if (leading_N == true && leading_G == true) {
+			leading_Tokens = checkLeadingTokens(leading_num, LEADING_SORT_TOKEN, leading_alg);
+			if (leading_Tokens == true) {
 				strToInt_Sz = stoi(firstArgToken);
 				insAlg = argv[2];
-				checkInsertArg(strToInt_Sz, DEF_ORDER, insAlg);
+				insAlgToken = getToken(insAlg);
+				checkInsertArg(strToInt_Sz, DEF_ORDER, insAlgToken);
 			}
 		}
 		else {
 			leading_sort = getLeadingToken(argv[1]), leading_alg = getLeadingToken(argv[2]);
-			leading_S = checkLeadingTokens(leading_sort), leading_G = checkLeadingTokens(leading_alg);
-			if (leading_S == true && leading_G == true) {
+			leading_Tokens = checkLeadingTokens(LEADING_NUM_TOKEN, leading_sort, leading_alg);
+			if (leading_Tokens == true) {
 				sort = argv[1];
 				sortToken = getToken(sort);
 				insAlg = argv[2];
-				checkInsertArg(DEF_SIZE, sortToken, insAlg);
+				insAlgToken = getToken(insAlg);
+				checkInsertArg(DEF_SIZE, sortToken, insAlgToken);
 			}
 		}
 	}
 	else if (argc == 2) {
-		leading_sort = getLeadingToken(argv[1]);
-		leading_G = checkLeadingTokens(leading_alg);
-		if (leading_G == true) {
-			insAlg = argv[1];
-			checkInsertArg(DEF_SIZE, DEF_ORDER, insAlg);
+		leading_alg = getLeadingToken(argv[1]);
+		leading_Tokens = checkLeadingTokens(LEADING_NUM_TOKEN, LEADING_SORT_TOKEN, leading_alg);
+		if (leading_Tokens == true) {
+			insAlgToken = getToken(argv[1]);
+			checkInsertArg(DEF_SIZE, DEF_ORDER, insAlgToken);
 		}
 	}
 	else {
@@ -113,14 +113,20 @@ int main(int argc, char** argv)
 	}
 }
 
-bool checkLeadingTokens(string t) {
-	if (t.compare(LEADING_NUM_TOKEN) == 0 || t.compare(LEADING_SORT_TOKEN) == 0 || t.compare(LEADING_ALG_TOKEN) == 0) {
-		return true;
-	}
-	else {
-		error("Enter the valid leading parameters (N S G).");
+bool checkLeadingTokens(string n, string s, string g) {
+	if (n.compare(LEADING_NUM_TOKEN) != 0) {
+		error("The first leading parameter token must be 'N'. Enter the valid leading parameters (N S G) in that order.");
 		return false;
 	}
+	if (s.compare(LEADING_SORT_TOKEN) != 0) {
+		error("The second leading parameter token must be 'S'. Enter the valid leading parameters (N S G) in that order.");
+		return false;
+	}
+	if (g.compare(LEADING_ALG_TOKEN) != 0) {
+		error("The third leading parameter token must be 'G'. Enter the valid leading parameters (N S G) in that order.");
+		return false;
+	}
+	return true;
 }
 
 string getLeadingToken(string str) {
@@ -134,7 +140,7 @@ string getToken(string str) {
 }
 
 bool is_number(const string& s) {
-	return(strspn(s.c_str(), "0123456789") == s.size());
+	return (strspn(s.c_str(), "0123456789") == s.size());
 }
 
 void checkInsertArg(int strToInt_Sz, string sortToken, string insAlg) {
@@ -148,7 +154,7 @@ void checkInsertArg(int strToInt_Sz, string sortToken, string insAlg) {
 }
 
 void error(string message = "Enter a positive number!") {
-	cout << "ERROR: " + message << endl;
+	cerr << "ERROR: " + message << endl;
 }
 
 void ascending(int n) {
