@@ -158,6 +158,9 @@ void error(string message = "Enter a positive number!") {
 }
 
 void ascending(int n) {
+
+	cout << endl;
+	cout << "Command [N=" << n << "] [S=A] " << "G=I executed." << endl << endl;
 	int size = 0;
 	if (n > 1) {
 		int *array = new int[n];
@@ -175,6 +178,9 @@ void ascending(int n) {
 }
 
 void descending(int n) {
+
+	cout << endl;
+	cout << "Command [N=" << n << "] [S=D] " << "G=I executed." << endl << endl;
 	int size = 0;
 	if (n > 1) {
 		int *array = new int[n];
@@ -193,6 +199,9 @@ void descending(int n) {
 }
 
 void random(int n) {
+
+	cout << endl;
+	cout << "Command [N=" << n << "] [S=R] " << "G=I executed." << endl << endl;
 	int size = 0;
 	/* This will create an array with all random numbers.*/
 	if (n > 1) {
